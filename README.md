@@ -7,3 +7,4 @@ A tool that allows the automatic start of a Farming Simulator 22 server in just 
 - Add config
 - Cli command
 - Mods downloader
+- Add steam check
