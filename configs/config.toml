@@ -1,0 +1,8 @@
+[fs22]
+game_dir = 'D:\Jeux\Farming Simulator 22\dedicatedServer.exe'
+steam = true
+
+[web]
+port = 8080
+host = "localhost"
+password = "password"
