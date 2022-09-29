@@ -8,7 +8,7 @@
 ## 🚀 In the future:
 - [ ] Auto start server (API implementation)
 - [ ] Restart on server crash
-- [ ] Add config file
+- [X] Add config file
 - [ ] CLI command to talk with API
 - [ ] Mods downloader
 - [ ] Add steam check
