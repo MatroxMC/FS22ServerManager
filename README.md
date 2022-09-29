@@ -13,6 +13,7 @@
 - [ ] Mods downloader
 - [ ] Add steam check
 
+[![wakatime](https://wakatime.com/badge/user/edc0f08e-3aca-4441-8b23-94a859fe119a/project/efbd4c3e-dfcc-498f-be5e-e620af0bc16f.svg)](https://wakatime.com/badge/user/edc0f08e-3aca-4441-8b23-94a859fe119a/project/efbd4c3e-dfcc-498f-be5e-e620af0bc16f)
 
 ## 📨 Message from the developer :
 - This is a work in progress, it is not yet usable ! 
