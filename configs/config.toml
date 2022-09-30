@@ -1,6 +1,7 @@
-[fs22]
-game_dir = 'D:\Jeux\Farming Simulator 22\dedicatedServer.exe'
+[game]
+version = "FS22"
 steam = true
+directory = "D:\\Jeux\\Farming Simulator 22"
 
 [web]
 port = 8080

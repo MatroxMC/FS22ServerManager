@@ -1,0 +1,238 @@
+2022/10/01 01:36:31 main.go:26: Starting game
+2022/10/01 01:36:31 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:36:31 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:36:31 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:36:31 main.go:36: Steam : true
+2022/10/01 01:37:04 main.go:26: Starting game
+2022/10/01 01:37:04 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:37:04 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:37:04 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:37:04 main.go:36: Steam : true
+2022/10/01 01:38:00 main.go:26: Starting game
+2022/10/01 01:38:00 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:38:00 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:38:00 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:38:00 main.go:36: Steam : true
+2022/10/01 01:38:01 main.go:44: Game closed with error : exit status 0xc000013a
+2022/10/01 01:38:09 main.go:26: Starting game
+2022/10/01 01:38:09 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:38:09 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:38:09 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:38:09 main.go:36: Steam : true
+2022/10/01 01:38:11 main.go:44: Game closed with error : exit status 0xc000013a
+2022/10/01 01:38:38 main.go:26: Starting game
+2022/10/01 01:38:38 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:38:38 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:38:38 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:38:38 main.go:36: Steam : true
+2022/10/01 01:39:01 main.go:26: Starting game
+2022/10/01 01:39:01 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:39:01 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:39:01 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:39:01 main.go:36: Steam : true
+2022/10/01 01:39:27 main.go:26: Starting game
+2022/10/01 01:39:27 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:39:27 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:39:27 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:39:27 main.go:36: Steam : true
+2022/10/01 01:39:44 main.go:26: Starting game
+2022/10/01 01:39:44 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:39:44 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:39:44 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:39:44 main.go:36: Steam : true
+2022/10/01 01:40:02 main.go:26: Starting game
+2022/10/01 01:40:02 main.go:33: Version : Farming Simulator 22
+2022/10/01 01:40:02 main.go:34: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:40:02 main.go:35: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:40:02 main.go:36: Steam : true
+2022/10/01 01:40:04 main.go:45: Game restart in 5 seconds
+2022/10/01 01:40:04 main.go:49: 5...
+2022/10/01 01:40:04 main.go:49: 4...
+2022/10/01 01:40:04 main.go:49: 3...
+2022/10/01 01:40:04 main.go:49: 2...
+2022/10/01 01:40:04 main.go:49: 1...
+2022/10/01 01:40:04 main.go:70: Killing process before restart...
+2022/10/01 01:40:05 main.go:52: Error while starting the game : invalid argument
+2022/10/01 01:40:21 main.go:27: Starting game
+2022/10/01 01:40:21 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:40:21 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:40:21 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:40:21 main.go:37: Steam : true
+2022/10/01 01:40:23 main.go:46: Game restart in 5 seconds
+2022/10/01 01:40:23 main.go:50: 5...
+2022/10/01 01:40:24 main.go:50: 4...
+2022/10/01 01:40:25 main.go:50: 3...
+2022/10/01 01:40:26 main.go:50: 2...
+2022/10/01 01:40:27 main.go:50: 1...
+2022/10/01 01:40:28 main.go:70: Killing process before restart...
+2022/10/01 01:40:29 main.go:52: Error while starting the game : invalid argument
+2022/10/01 01:41:05 main.go:27: Starting game
+2022/10/01 01:41:05 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:41:05 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:41:05 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:41:05 main.go:37: Steam : true
+2022/10/01 01:41:06 main.go:46: Game restart in 5 seconds
+2022/10/01 01:41:06 main.go:50: 5...
+2022/10/01 01:41:07 main.go:50: 4...
+2022/10/01 01:41:08 main.go:50: 3...
+2022/10/01 01:41:09 main.go:50: 2...
+2022/10/01 01:41:10 main.go:50: 1...
+2022/10/01 01:41:11 main.go:71: Killing process before restart...
+2022/10/01 01:41:12 main.go:52: Error while starting the game : invalid argument
+2022/10/01 01:41:42 main.go:27: Starting game
+2022/10/01 01:41:42 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:41:42 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:41:42 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:41:42 main.go:37: Steam : true
+2022/10/01 01:41:43 main.go:46: Game restart in 5 seconds
+2022/10/01 01:41:44 main.go:51: 5...
+2022/10/01 01:41:45 main.go:51: 4...
+2022/10/01 01:41:46 main.go:51: 3...
+2022/10/01 01:41:47 main.go:51: 2...
+2022/10/01 01:41:48 main.go:51: 1...
+2022/10/01 01:41:49 main.go:70: Killing process before restart...
+2022/10/01 01:41:50 main.go:52: Error while starting the game : invalid argument
+2022/10/01 01:42:29 main.go:27: Starting game
+2022/10/01 01:42:29 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:42:29 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:42:29 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:42:29 main.go:37: Steam : true
+2022/10/01 01:42:30 main.go:46: Game restart in 5 seconds
+2022/10/01 01:42:30 main.go:51: 5...
+2022/10/01 01:42:31 main.go:51: 4...
+2022/10/01 01:42:32 main.go:51: 3...
+2022/10/01 01:42:33 main.go:51: 2...
+2022/10/01 01:42:34 main.go:51: 1...
+2022/10/01 01:42:36 main.go:70: Killing process before restart...
+2022/10/01 01:42:37 main.go:52: Error while starting the game : invalid argument
+2022/10/01 01:43:14 main.go:27: Starting game
+2022/10/01 01:43:14 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:43:14 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:43:14 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:43:14 main.go:37: Steam : true
+2022/10/01 01:43:17 main.go:46: Game restart in 5 seconds
+2022/10/01 01:43:18 main.go:51: Restart in 5
+2022/10/01 01:43:19 main.go:51: Restart in 4
+2022/10/01 01:43:20 main.go:51: Restart in 3
+2022/10/01 01:43:21 main.go:51: Restart in 2
+2022/10/01 01:43:22 main.go:51: Restart in 1
+2022/10/01 01:43:23 main.go:70: Killing process before restart...
+2022/10/01 01:44:14 main.go:27: Starting game
+2022/10/01 01:44:14 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:44:14 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:44:14 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:44:14 main.go:37: Steam : true
+2022/10/01 01:44:22 main.go:46: Game restart in 5 seconds
+2022/10/01 01:44:23 main.go:51: Restart in 5
+2022/10/01 01:44:26 main.go:27: Starting game
+2022/10/01 01:44:26 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:44:26 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:44:26 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:44:26 main.go:37: Steam : true
+2022/10/01 01:44:33 main.go:46: Game restart in 5 seconds
+2022/10/01 01:44:34 main.go:51: Restart in 5
+2022/10/01 01:44:35 main.go:51: Restart in 4
+2022/10/01 01:44:36 main.go:51: Restart in 3
+2022/10/01 01:44:37 main.go:51: Restart in 2
+2022/10/01 01:44:38 main.go:51: Restart in 1
+2022/10/01 01:44:39 main.go:66: Killing process before restart...
+2022/10/01 01:45:17 main.go:46: Game restart in 5 seconds
+2022/10/01 01:45:18 main.go:51: Restart in 5
+2022/10/01 01:45:20 main.go:27: Starting game
+2022/10/01 01:45:20 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:45:20 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:45:20 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:45:20 main.go:37: Steam : true
+2022/10/01 01:45:22 main.go:46: Game restart in 5 seconds
+2022/10/01 01:45:23 main.go:51: Restart in 5
+2022/10/01 01:45:24 main.go:51: Restart in 4
+2022/10/01 01:45:25 main.go:51: Restart in 3
+2022/10/01 01:45:26 main.go:51: Restart in 2
+2022/10/01 01:45:27 main.go:51: Restart in 1
+2022/10/01 01:45:28 main.go:66: Killing process before restart...
+2022/10/01 01:46:05 main.go:46: Game restart in 5 seconds
+2022/10/01 01:46:15 main.go:27: Starting game
+2022/10/01 01:46:15 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:46:15 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:46:15 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:46:15 main.go:37: Steam : true
+2022/10/01 01:46:15 main.go:34: Starting game
+2022/10/01 01:46:38 main.go:46: Game restart in 5 seconds
+2022/10/01 01:46:40 main.go:51: Restart in 5
+2022/10/01 01:46:41 main.go:51: Restart in 4
+2022/10/01 01:46:42 main.go:51: Restart in 3
+2022/10/01 01:46:43 main.go:51: Restart in 2
+2022/10/01 01:46:44 main.go:51: Restart in 1
+2022/10/01 01:46:45 main.go:34: Starting game
+2022/10/01 01:47:37 main.go:46: Game restart in 5 seconds
+2022/10/01 01:47:38 main.go:51: Restart in 5
+2022/10/01 01:47:41 main.go:27: Starting game
+2022/10/01 01:47:41 main.go:34: Version : Farming Simulator 22
+2022/10/01 01:47:41 main.go:35: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:47:41 main.go:36: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:47:41 main.go:37: Steam : true
+2022/10/01 01:47:41 main.go:34: Starting game
+2022/10/01 01:47:42 main.go:46: Game restart in 5 seconds
+2022/10/01 01:47:53 main.go:29: Version : Farming Simulator 22
+2022/10/01 01:47:53 main.go:30: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:47:53 main.go:31: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:47:53 main.go:32: Steam : true
+2022/10/01 01:47:53 main.go:34: Starting game
+2022/10/01 01:47:56 main.go:41: Game closed, restarting in few seconds
+2022/10/01 01:47:56 main.go:34: Starting game
+2022/10/01 01:47:58 main.go:41: Game closed, restarting in few seconds
+2022/10/01 01:47:58 main.go:34: Starting game
+2022/10/01 01:48:05 main.go:41: Game closed, restarting in few seconds
+2022/10/01 01:48:05 main.go:34: Starting game
+2022/10/01 01:48:12 main.go:41: Game closed, restarting in few seconds
+2022/10/01 01:48:12 main.go:34: Starting game
+2022/10/01 01:50:38 main.go:41: Game closed, restarting in few seconds
+2022/10/01 01:50:38 main.go:34: Starting game
+2022/10/01 01:50:54 main.go:28: -------- Starting  FS22 ---------
+2022/10/01 01:50:54 main.go:29: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:50:54 main.go:30: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:50:54 main.go:31: Steam : true
+2022/10/01 01:50:54 main.go:32: ShowWindow : true
+2022/10/01 01:50:54 main.go:33: -------------------------------
+2022/10/01 01:50:54 main.go:34: Game starting...
+2022/10/01 01:50:54 main.go:55: Done.
+2022/10/01 01:55:10 main.go:42: Game closed, restarting in few seconds...
+2022/10/01 01:55:10 main.go:34: Game starting...
+2022/10/01 01:55:10 main.go:55: Done.
+2022/10/01 01:55:21 main.go:28: -------- Server Manager  (FS22-FS19) ---------
+2022/10/01 01:55:21 main.go:29: Steam : true
+2022/10/01 01:55:21 main.go:30: Show Window : true
+2022/10/01 01:55:21 main.go:31: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:55:21 main.go:32: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:55:21 main.go:33: ----------------------------------------------
+2022/10/01 01:55:21 main.go:34: Game starting...
+2022/10/01 01:55:21 main.go:55: Done.
+2022/10/01 01:55:48 main.go:28: -------- Server Manager  (FS22-FS19) ---------
+2022/10/01 01:55:48 main.go:29: Steam : true
+2022/10/01 01:55:48 main.go:30: Show Window : false
+2022/10/01 01:55:48 main.go:31: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:55:48 main.go:32: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:55:48 main.go:33: ----------------------------------------------
+2022/10/01 01:55:48 main.go:34: Game starting...
+2022/10/01 01:55:48 main.go:55: Done.
+2022/10/01 01:55:58 main.go:42: Game closed, restarting in few seconds...
+2022/10/01 01:55:58 main.go:34: Game starting...
+2022/10/01 01:55:58 main.go:55: Done.
+2022/10/01 01:56:08 main.go:42: Game closed, restarting in few seconds...
+2022/10/01 01:56:08 main.go:34: Game starting...
+2022/10/01 01:56:08 main.go:55: Done.
+2022/10/01 01:56:40 main.go:28: -------- Server Manager (FS22-FS19) ---------
+2022/10/01 01:56:40 main.go:29: Version : FS22
+2022/10/01 01:56:40 main.go:30: Steam : true
+2022/10/01 01:56:40 main.go:31: Show Window : true
+2022/10/01 01:56:40 main.go:32: Binary : D:\Jeux\Farming Simulator 22/dedicatedServer.exe
+2022/10/01 01:56:40 main.go:33: Directory : D:\Jeux\Farming Simulator 22
+2022/10/01 01:56:40 main.go:34: ---------------------------------------------
+2022/10/01 01:56:40 main.go:34: Game starting...
+2022/10/01 01:56:40 main.go:55: Done.
+2022/10/01 01:56:58 main.go:43: Game closed, restarting in few seconds...
+2022/10/01 01:56:58 main.go:34: Game starting...
+2022/10/01 01:56:58 main.go:55: Done.
+2022/10/01 01:57:09 main.go:43: Game closed, restarting in few seconds...
+2022/10/01 01:57:09 main.go:34: Game starting...
+2022/10/01 01:57:09 main.go:55: Done.

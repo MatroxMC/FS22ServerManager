@@ -1,7 +1,10 @@
+debug = 0
+
 [game]
-  version = "FS22"
-  steam = true
   directory = "D:\\Jeux\\Farming Simulator 22"
+  steam = true
+  version = "FS22"
+  show_window = true
 
 [web]
   port = 8080

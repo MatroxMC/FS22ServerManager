@@ -2,161 +2,119 @@ package game
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
-	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
-	"github.com/MatroxMC/FS22ServerManager/cmd/http"
 	"github.com/MatroxMC/FS22ServerManager/internal/game/version"
 	"github.com/MatroxMC/FS22ServerManager/internal/process"
-	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
-	"github.com/MatroxMC/FS22ServerManager/internal/tools/dir"
 	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"log"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"sync"
+	"path"
 )
 
+type Version string
+type Binary string
+type Steam bool //TODO : ADD function to check if steams is available
+
+// This var save all game version
+var versions = []version.Version{
+	version.FS22{},
+	version.FS19{},
+}
+
 type Game struct {
-	Version  version.Version
-	Path     string
-	Steam    bool
-	Property *Property
+	Binary     Binary
+	Steam      Steam
+	Version    version.Version
+	Process    *process.Process
+	ShowWindow bool
+	Directory  string
+	OnClose    func(Game, error) error
+	OnStart    func(Game) error
 }
 
-func (g Game) Start(w *sync.WaitGroup) (*process.Process, error) {
-	farming.Logi("Start process")
-
-	log.Println("Starting Web Server")
-
-	bin := filepath.Join(g.Path, g.Version.BinaryName())
-	pp, err := process.NewProcess(bin)
+func (g Game) Start() error {
+	log.Print("Game starting...")
+	p, err := process.New(g.Binary.String())
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	c := make(chan os.Signal, 1)
+	g.Process = p
 
-	//This routine is used to check the signal and kill the process
-	go func() {
-		for {
-			signal.Notify(c)
-
-			fmt.Println(c)
-
-			switch <-c {
-			case os.Interrupt:
-			case os.Kill:
-
-				err := pp.Stop()
-				if err != nil {
-					fmt.Println("Error while stopping process: ", err)
-				}
-			}
-
-			pp.Cmd.Process.Kill()
-
-			farming.Logi("End signal routine")
-			break
-		}
-	}()
-
-	w.Add(1)
-	go func() {
-		err := pp.Start()
+	if g.OnStart != nil {
+		err = g.OnStart(g)
 		if err != nil {
-			w.Done()
-			return
+			return err
 		}
+	}
 
-		log.Println("Web Server running")
+	//Start the process
+	err = g.Process.Start()
+	if err != nil {
+		return err
+	}
 
-		err = pp.Cmd.Wait()
-		if err != nil {
-			log.Println("Server stopped, restarting in 2 seconds...")
+	log.Print("Done.")
 
-			_ = terminal.Clean()
-			_, err = g.Start(w) //restart server
-			if err != nil {
-				log.Fatal("Error while restarting server: ", err)
-			}
-		}
+	err = g.Process.Wait()
 
-		w.Done()
+	if g.OnClose != nil {
+		return g.OnClose(g, err)
+	}
 
-		signal.Stop(c) //stop listening for signals if process is stopped
-		close(c)
-
-		farming.Logi("Close signal routine 2")
-	}()
-
-	return pp, nil
+	return nil
 }
 
-type Property struct {
-	Game farming.FarmingSimulator `toml:"game"`
-	Web  http.Web                 `toml:"web"`
+func (g Game) Restart() error {
+	if g.Process.Running() {
+		_ = g.Process.Kill()
+	}
+
+	return g.Start()
 }
 
-func (p Property) Init() (*Property, error) {
-
-	//create game config if not exist
-	err := file.Exist(farming.ConfName)
-	if err != nil {
-		f, err := os.Create(farming.ConfName)
-		defer f.Close()
-		if err != nil {
-			return nil, err
-		}
-
-		//write default config
-		err = toml.NewEncoder(f).Encode(p)
-		if err != nil {
-			return nil, err
-		}
-
-		return &p, nil
-	}
-
-	var config Property
-	_, err = toml.DecodeFile(farming.ConfName, &config)
+func New(directory string, version Version, steam Steam, window bool) (*Game, error) {
+	//check if version exist
+	v, err := version.Find()
 	if err != nil {
 		return nil, err
-	}
-
-	return &config, nil
-}
-
-func New(property *Property) (*Game, error) {
-
-	v, err := version.FindByString(property.Game.Version)
-	if err != nil {
-		return nil, err
-	}
-
-	//check if game dir exist
-	err = dir.Exist(property.Game.Directory)
-	if err != nil {
-		return nil, err
-	}
-
-	//check if mods dir exist
-	err = dir.Exist(property.Game.Directory)
-	if err != nil {
-		log.Println("!!WARNING!! Mods directory not found")
 	}
 
 	//check if game binary exist
-	serverBinary := filepath.Join(property.Game.Directory, v.BinaryName())
-	err = file.Exist(serverBinary)
+	binary := Binary(path.Join(directory, v.BinaryName()))
+	err = binary.Exist()
 	if err != nil {
 		return nil, err
 	}
 
+	//TODO : ADD MODS CHECK AND STEAM CHECK
 	return &Game{
-		Version:  v,
-		Path:     property.Game.Directory,
-		Steam:    property.Game.Steam,
-		Property: property,
+		Version:    v,
+		Binary:     binary,
+		Steam:      steam,
+		Directory:  directory,
+		ShowWindow: window,
 	}, nil
+}
+
+func (v Version) Find() (version.Version, error) {
+	for _, vv := range versions {
+		for _, name := range vv.Names() {
+			if name == string(v) {
+				return vv, nil
+			}
+		}
+	}
+
+	return version.FS22{}, fmt.Errorf("version %s not found", v)
+}
+
+func (v Version) String() string {
+	return string(v)
+}
+
+func (d Binary) Exist() error {
+	return file.Exist(string(d))
+}
+
+func (d Binary) String() string {
+	return string(d)
 }

@@ -17,3 +17,8 @@ func Clean() error {
 
 	return nil
 }
+
+func Title(t string) {
+	cmd := exec.Command("title", t)
+	_ = cmd.Run()
+}

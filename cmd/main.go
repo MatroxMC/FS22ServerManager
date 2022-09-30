@@ -1,54 +1,87 @@
 package main
 
 import (
+	"fmt"
+	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
 	"github.com/MatroxMC/FS22ServerManager/cmd/http"
 	"github.com/MatroxMC/FS22ServerManager/internal/game"
 	"github.com/MatroxMC/FS22ServerManager/internal/game/version"
+	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
+	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"log"
-	"sync"
+	"os"
 )
 
-var Game game.Game
-
-var Config = game.Property{
-	Game: farming.FarmingSimulator{
-		Steam:     true,
-		Directory: farming.GameDir,
-		Version:   version.FS22{}.String(),
+var Config = Property{
+	Game: farming.Farming{
+		Steam:      true,
+		Directory:  farming.GameDir,
+		Version:    game.Version(version.FS22{}.String()),
+		ShowWindow: true,
 	},
 	Web: http.Web{
 		Port:     8080,
 		Host:     "localhost",
 		Password: "password",
 	},
+	Debug: 0,
 }
 
-var Group = sync.WaitGroup{}
+type Property struct {
+	Game  farming.Farming `toml:"game"`
+	Web   http.Web        `toml:"web"`
+	Debug int             `toml:"debug"`
+}
 
 func main() {
-	farming.Logi("Server Started")
+	err := SetLogFile("log.txt")
+	if err != nil {
+		log.Println("Error while setting log file : ", err)
+	}
+
+	//Init and load configuration file
 	property, err := Config.Init()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error while loading config file : ", err)
 	}
 
-	d, err := game.New(property)
+	//set console name
+	terminal.Title("FS22 Server Manager - " + property.Game.Version.String())
+
+	//Start the game
+	g, err := property.Game.Start()
 	if err != nil {
-		log.Fatalf("Error while loading game: %v", err)
+		log.Fatal("Error while starting the game : ", err)
 	}
 
-	Game = *d
+	fmt.Println(g)
+}
 
-	Group.Add(1)
-	_, err = Game.Start(&Group)
+// Init function make or load the config file
+func (p Property) Init() (*Property, error) {
+	err := file.Exist(farming.ConfName)
 	if err != nil {
-		log.Println(err)
+		f, err := os.Create(farming.ConfName)
+		defer f.Close()
+		if err != nil {
+			return nil, err
+		}
+
+		//write default config
+		err = toml.NewEncoder(f).Encode(p)
+		if err != nil {
+			return nil, err
+		}
+
+		return &p, nil
 	}
 
-	Group.Wait()
+	var config Property
+	_, err = toml.DecodeFile(farming.ConfName, &config)
+	if err != nil {
+		return nil, err
+	}
 
-	log.Println("Server stopped")
-
-	farming.Logi("Server stopped")
+	return &config, nil
 }
