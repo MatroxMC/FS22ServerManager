@@ -2,3 +2,4 @@
 LICENSE
 *.exe
 *.toml
+*.log
