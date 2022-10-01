@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/MatroxMC/FS22ServerManager/internal/game/version"
 	"github.com/MatroxMC/FS22ServerManager/internal/process"
+	"github.com/MatroxMC/FS22ServerManager/internal/steam"
 	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"log"
 	"path"
@@ -11,7 +12,6 @@ import (
 
 type Version string
 type Binary string
-type Steam bool //TODO : ADD function to check if steams is available
 
 // This var save all game version
 var versions = []version.Version{
@@ -21,7 +21,7 @@ var versions = []version.Version{
 
 type Game struct {
 	Binary     Binary
-	Steam      Steam
+	Steam      steam.Steam
 	Version    version.Version
 	Process    *process.Process
 	ShowWindow bool
@@ -46,7 +46,7 @@ func (g Game) Start() error {
 		}
 	}
 
-	//Start the process
+	//Init the process
 	err = g.Process.Start()
 	if err != nil {
 		return err
@@ -71,7 +71,7 @@ func (g Game) Restart() error {
 	return g.Start()
 }
 
-func New(directory string, version Version, steam Steam, window bool) (*Game, error) {
+func New(directory string, version Version, steam steam.Steam, window bool) (*Game, error) {
 	//check if version exist
 	v, err := version.Find()
 	if err != nil {

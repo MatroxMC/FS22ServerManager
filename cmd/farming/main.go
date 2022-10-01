@@ -3,7 +3,10 @@ package farming
 import (
 	"github.com/MatroxMC/FS22ServerManager/internal/game"
 	"github.com/MatroxMC/FS22ServerManager/internal/process"
+	"github.com/MatroxMC/FS22ServerManager/internal/steam"
 	"log"
+	"strings"
+	"time"
 )
 
 const (
@@ -13,13 +16,35 @@ const (
 
 type Farming struct {
 	Directory  game.Binary  `toml:"directory"`
-	Steam      game.Steam   `toml:"steam"`
+	Steam      steam.Steam  `toml:"steam"`
 	Version    game.Version `toml:"version"`
 	running    process.Status
 	ShowWindow bool `toml:"show_window"`
 }
 
 func (f Farming) Start() (game.Game, error) {
+	g, err := f.init()
+	if err != nil {
+		return game.Game{}, err
+	}
+
+	//If steam use steam
+	if f.Steam {
+		for err := f.Steam.IsRunning(); err != nil; {
+			log.Println("Steam is not running, waiting...")
+			time.Sleep(5 * time.Second)
+
+			err = f.Steam.IsRunning() //Retry to check if steam is running or not
+		}
+
+		user, _ := f.Steam.ActiveUser()
+		log.Println("Active user on steam:", strings.ToUpper(user))
+	}
+
+	return g, nil
+}
+
+func (f Farming) init() (game.Game, error) {
 	g, err := game.New(f.Directory.String(), f.Version, f.Steam, f.ShowWindow)
 	if err != nil {
 		return game.Game{}, err
@@ -48,11 +73,6 @@ func (f Farming) Start() (game.Game, error) {
 		}
 
 		return nil
-	}
-
-	err = g.Start() //TODO ADD THIS IN GO ROUTINE
-	if err != nil {
-		return game.Game{}, err
 	}
 
 	return *g, nil

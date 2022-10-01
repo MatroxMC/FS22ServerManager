@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
 	"github.com/MatroxMC/FS22ServerManager/cmd/http"
@@ -49,13 +48,11 @@ func main() {
 	//set console name
 	terminal.Title("FS22 Server Manager - " + property.Game.Version.String())
 
-	//Start the game
-	g, err := property.Game.Start()
+	//Start the web server
+	_, err = property.Game.Start()
 	if err != nil {
 		log.Fatal("Error while starting the game : ", err)
 	}
-
-	fmt.Println(g)
 }
 
 // Init function make or load the config file
