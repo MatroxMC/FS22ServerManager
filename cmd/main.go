@@ -34,7 +34,7 @@ type Property struct {
 }
 
 func main() {
-	err := SetLogFile("log.txt")
+	err := SetLogFile("debug.log")
 	if err != nil {
 		log.Println("Error while setting log file : ", err)
 	}
