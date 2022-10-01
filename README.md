@@ -8,7 +8,7 @@ This is a tools to manage your FS22 server.
 
 ## 🚀 In the future :
 - [ ] Auto start server (API implementation)
-- [ ] Restart on server crash
+- [X] Restart on server crash
 - [ ] Add config file (toml)
 - [ ] CLI command to talk with API
 - [ ] Mods downloader
