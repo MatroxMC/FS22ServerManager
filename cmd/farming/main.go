@@ -30,15 +30,35 @@ func (f Farming) Start() (game.Game, error) {
 
 	//If steam use steam
 	if f.Steam {
-		for err := f.Steam.IsRunning(); err != nil; {
-			log.Println("Steam is not running, waiting...")
-			time.Sleep(5 * time.Second)
+		var run bool = false //If the game is running
+		var msg bool = false //If the message has been sent
 
-			err = f.Steam.IsRunning() //Retry to check if steam is running or not
+		for !run {
+			run = f.Steam.IsRunning()
+			if !run {
+				if !msg {
+					log.Println("Try to detect Steam... (If you don't have steam, please set steam to false in the config file)")
+					msg = true
+				}
+
+				time.Sleep(5 * time.Second)
+			} else {
+				pid, _ := f.Steam.GetPID()
+				user, _ := f.Steam.GetAutoLoginUser()
+				user = strings.Title(user)
+				log.Printf("%s is logged in Steam with PID %o", user, pid)
+			}
 		}
+	}
 
-		user, _ := f.Steam.ActiveUser()
-		log.Println("Active user on steam:", strings.ToUpper(user))
+	err = g.Start()
+	if err != nil {
+		return game.Game{}, err
+	}
+
+	err = g.Wait()
+	if err != nil {
+		return game.Game{}, err
 	}
 
 	return g, nil

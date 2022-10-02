@@ -1,13 +1,13 @@
 package steam
 
 import (
-	"fmt"
 	"golang.org/x/sys/windows/registry"
+	"os"
 )
 
 type Steam bool
 
-func (s Steam) ActiveUser() (string, error) {
+func (s Steam) GetAutoLoginUser() (string, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Valve\Steam`, registry.QUERY_VALUE)
 	if err != nil {
 		return "", err
@@ -22,28 +22,40 @@ func (s Steam) ActiveUser() (string, error) {
 	return u, nil
 }
 
-func (s Steam) IsRunning() error {
+func (s Steam) IsRunning() bool {
 	//thx to https://github.com/jshackles/idle_master/issues/217
 
+	pid, err := s.GetPID()
+	if err != nil {
+		return false
+	}
+
+	//if pid is 0, steam is not running
+	if pid == 0 {
+		return false
+	}
+
+	//check if process is running
+	_, err = os.FindProcess(int(pid))
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func (s Steam) GetPID() (int, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Valve\Steam\ActiveProcess`, registry.QUERY_VALUE)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer k.Close()
 
+	//get pid process in registry
 	pid, _, err := k.GetIntegerValue("pid")
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	login, _, err := k.GetIntegerValue("ActiveUser")
-	if err != nil {
-		return err
-	}
-
-	if pid == 0 || login == 0 {
-		return fmt.Errorf("steam is not running")
-	}
-
-	return nil
+	return int(pid), nil
 }

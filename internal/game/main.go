@@ -71,6 +71,14 @@ func (g Game) Restart() error {
 	return g.Start()
 }
 
+func (g Game) Wait() error {
+	err := g.Process.Wait()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func New(directory string, version Version, steam steam.Steam, window bool) (*Game, error) {
 	//check if version exist
 	v, err := version.Find()
