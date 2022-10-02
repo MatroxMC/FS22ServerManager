@@ -2,28 +2,17 @@ package process
 
 import (
 	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
-	"os"
 	"os/exec"
 	"syscall"
-)
-
-const (
-	RUNNING = 0
-	STOPPED = 1
 )
 
 type Process struct {
 	Executable string
 	Cmd        exec.Cmd
-	Signal     chan os.Signal
 	Killed     bool
 }
 
 type Status int
-
-func signal() {
-
-}
 
 func New(path string) (*Process, error) {
 	err := file.Exist(path)
@@ -45,19 +34,19 @@ func (p *Process) ShowWindow(d bool) {
 	}
 }
 
-func (p *Process) Start() error {
+func (p *Process) Run() error {
 	return p.Cmd.Start()
 }
 
 func (p *Process) Stop() error {
-
-	return nil
+	return p.Kill()
 }
 
 func (p *Process) Running() bool {
-	return p.Cmd.ProcessState != nil
+	return p.Cmd.Process == nil
 }
 
+// Wait wait cmd to finish
 func (p *Process) Wait() error {
 	return p.Cmd.Wait()
 }

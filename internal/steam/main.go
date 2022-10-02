@@ -1,14 +1,59 @@
 package steam
 
 import (
+	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"golang.org/x/sys/windows/registry"
 	"os"
+	"time"
+)
+
+const (
+	RegistryKey  = registry.CURRENT_USER
+	RegistryPath = `Software\Valve\Steam`
 )
 
 type Steam bool
 
+func (s Steam) Wait() error {
+
+	var run = false //If the game is running
+	var msg = false //If the message has been sent
+
+	for !run {
+		run = s.IsRunning()
+		if !run {
+			if !msg {
+				msg = true
+			}
+			time.Sleep(time.Second * 2)
+		}
+	}
+
+	return nil
+}
+
+func (s Steam) GetExe() (string, error) {
+	k, err := registry.OpenKey(RegistryKey, RegistryPath, registry.QUERY_VALUE)
+	if err != nil {
+		return "", err
+	}
+	defer k.Close()
+	p, _, err := k.GetStringValue("SteamExe")
+
+	return p, err
+}
+
+func (s Steam) IsInstalled() bool {
+	p, err := s.GetExe()
+	err = file.Exist(p)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (s Steam) GetAutoLoginUser() (string, error) {
-	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Valve\Steam`, registry.QUERY_VALUE)
+	k, err := registry.OpenKey(RegistryKey, RegistryPath, registry.QUERY_VALUE)
 	if err != nil {
 		return "", err
 	}
@@ -23,8 +68,7 @@ func (s Steam) GetAutoLoginUser() (string, error) {
 }
 
 func (s Steam) IsRunning() bool {
-	//thx to https://github.com/jshackles/idle_master/issues/217
-
+	//https://github.com/jshackles/idle_master/issues/217
 	pid, err := s.GetPID()
 	if err != nil {
 		return false
@@ -45,7 +89,8 @@ func (s Steam) IsRunning() bool {
 }
 
 func (s Steam) GetPID() (int, error) {
-	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Valve\Steam\ActiveProcess`, registry.QUERY_VALUE)
+
+	k, err := registry.OpenKey(RegistryKey, RegistryPath+`\ActiveProcess`, registry.QUERY_VALUE)
 	if err != nil {
 		return 0, err
 	}

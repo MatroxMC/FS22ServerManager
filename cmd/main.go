@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
-	"github.com/MatroxMC/FS22ServerManager/cmd/http"
 	"github.com/MatroxMC/FS22ServerManager/internal/game"
 	"github.com/MatroxMC/FS22ServerManager/internal/game/version"
 	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
@@ -14,22 +13,16 @@ import (
 
 var Config = Property{
 	Game: farming.Farming{
-		Steam:      true,
-		Directory:  farming.GameDir,
-		Version:    game.Version(version.FS22{}.String()),
-		ShowWindow: true,
-	},
-	Web: http.Web{
-		Port:     8080,
-		Host:     "localhost",
-		Password: "password",
+		Steam:     true,
+		Directory: farming.GameDir,
+		Version:   game.Version(version.FS22{}.String()),
+		Window:    true,
 	},
 	Debug: 0,
 }
 
 type Property struct {
 	Game  farming.Farming `toml:"game"`
-	Web   http.Web        `toml:"web"`
 	Debug int             `toml:"debug"`
 }
 
@@ -40,15 +33,15 @@ func main() {
 	}
 
 	//Init and load configuration file
-	property, err := Config.Init()
+	property, err := Config.init()
 	if err != nil {
 		log.Fatal("Error while loading config file : ", err)
 	}
 
 	//set console name
-	terminal.Title("FS22 Server Manager - " + property.Game.Version.String())
+	_, _ = terminal.Title("FS22 Server Manager - " + property.Game.Version.String())
 
-	//Start the web server
+	//Run the web server
 	_, err = property.Game.Start()
 	if err != nil {
 		log.Fatal("Error while starting the game : ", err)
@@ -56,7 +49,7 @@ func main() {
 }
 
 // Init function make or load the config file
-func (p Property) Init() (*Property, error) {
+func (p Property) init() (*Property, error) {
 	err := file.Exist(farming.ConfName)
 	if err != nil {
 		f, err := os.Create(farming.ConfName)
