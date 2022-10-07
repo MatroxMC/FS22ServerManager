@@ -80,7 +80,7 @@ func (s Steam) IsRunning() bool {
 	}
 
 	//check if process is running
-	_, err = os.FindProcess(int(pid))
+	_, err = os.FindProcess(pid)
 	if err != nil {
 		return false
 	}

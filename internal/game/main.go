@@ -2,7 +2,6 @@ package game
 
 import (
 	"fmt"
-	"github.com/MatroxMC/FS22ServerManager/internal/game/version"
 	"github.com/MatroxMC/FS22ServerManager/internal/process"
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
 	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
@@ -12,19 +11,12 @@ import (
 	"path"
 )
 
-type Version string
 type Binary string
-
-// This var save all game version
-var versions = []version.Version{
-	version.FS22{},
-	version.FS19{},
-}
 
 type Game struct {
 	Binary      Binary
 	Steam       steam.Steam
-	Version     version.Version
+	Info        Info
 	Process     *process.Process
 	ShowWindow  bool
 	Directory   string
@@ -36,11 +28,11 @@ type Game struct {
 
 var CurrentGame Game
 
-func (g Game) Start() error {
+func (g Game) Start() (*Game, error) {
 	//Create a new process
 	p, err := process.New(g.Binary.String())
 	if err != nil {
-		return err
+		return &Game{}, err
 	}
 
 	g.Process = p   //set the process to the game
@@ -49,14 +41,14 @@ func (g Game) Start() error {
 	//If steam use steam
 	if g.Steam {
 		if !g.Steam.IsInstalled() {
-			return fmt.Errorf("steam is not installed")
+			return &Game{}, fmt.Errorf("steam is not installed")
 		}
 	}
 
 	if g.HandleStart != nil {
 		err = g.HandleStart(g)
 		if err != nil {
-			return err
+			return &Game{}, err
 		}
 	}
 
@@ -65,26 +57,17 @@ func (g Game) Start() error {
 		log.Print("Steam is not running, waiting for steam to run")
 		err := g.Steam.Wait()
 		if err != nil {
-			return err
+			return &Game{}, err
 		}
 	}
 
 	//Run the process with process package
 	err = p.Run()
 	if err != nil {
-		return err
+		return &Game{}, err
 	}
 
-	err = p.Wait()
-
-	if g.HandleClose != nil {
-		err := g.HandleClose(g, nil)
-		if err != nil {
-			log.Println(err)
-		}
-	}
-
-	return nil
+	return &g, nil
 }
 
 func (g Game) Init() (*Game, error) {
@@ -100,7 +83,7 @@ func (g Game) Init() (*Game, error) {
 	return &g, nil
 }
 
-func (g Game) Restart() error {
+func (g Game) Restart() (*Game, error) {
 	//Check if the process running and kill it
 	if g.Process.Running() {
 		_ = g.Process.Stop()
@@ -128,43 +111,21 @@ func (g Game) handleSignal(f ...func()) {
 	}()
 }
 
-func New(directory string, version Version, steam steam.Steam, window bool) (*Game, error) {
-	//check if version exist
-	v, err := version.Find()
-	if err != nil {
-		return nil, err
-	}
-
+func New(directory string, steam steam.Steam, window bool) (*Game, error) {
 	//check if game binary exist
-	binary := Binary(path.Join(directory, v.BinaryName()))
-	err = binary.Exist()
+	binary := Binary(path.Join(directory))
+	err := binary.Exist()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Game{
-		Version:    v,
+		Info:       DefaultInfo(),
 		Binary:     binary,
 		Steam:      steam,
 		Directory:  directory,
 		ShowWindow: window,
 	}, nil
-}
-
-func (v Version) Find() (version.Version, error) {
-	for _, vv := range versions {
-		for _, name := range vv.Names() {
-			if name == string(v) {
-				return vv, nil
-			}
-		}
-	}
-
-	return version.FS22{}, fmt.Errorf("version %s not found", v)
-}
-
-func (v Version) String() string {
-	return string(v)
 }
 
 func (d Binary) Exist() error {

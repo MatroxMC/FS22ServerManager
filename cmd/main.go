@@ -3,19 +3,17 @@ package main
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
-	"github.com/MatroxMC/FS22ServerManager/internal/game"
-	"github.com/MatroxMC/FS22ServerManager/internal/game/version"
 	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
 	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"log"
 	"os"
+	"sync"
 )
 
 var Config = Property{
 	Game: farming.Farming{
 		Steam:     true,
 		Directory: farming.GameDir,
-		Version:   game.Version(version.FS22{}.String()),
 		Window:    true,
 	},
 	Debug: 0,
@@ -25,6 +23,8 @@ type Property struct {
 	Game  farming.Farming `toml:"game"`
 	Debug int             `toml:"debug"`
 }
+
+var waitGroup = sync.WaitGroup{}
 
 func main() {
 	err := SetLogFile("debug.log")
@@ -38,14 +38,23 @@ func main() {
 		log.Fatal("Error while loading config file : ", err)
 	}
 
-	//set console name
-	_, _ = terminal.Title("FS22 Server Manager - " + property.Game.Version.String())
+	waitGroup.Add(1)
+	go func() {
+		//Run the web server
+		game, err := property.Game.Start()
+		if err != nil {
+			log.Fatal("Error while starting the game : ", err)
+		}
 
-	//Run the web server
-	_, err = property.Game.Start()
-	if err != nil {
-		log.Fatal("Error while starting the game : ", err)
-	}
+		//set console name
+		_, _ = terminal.Title(game.Info.String + " Server Manager")
+
+		game.Process.Wait()
+
+		waitGroup.Done()
+	}()
+
+	waitGroup.Wait()
 }
 
 // Init function make or load the config file

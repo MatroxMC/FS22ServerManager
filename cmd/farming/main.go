@@ -4,6 +4,7 @@ import (
 	"github.com/MatroxMC/FS22ServerManager/internal/game"
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
 	"log"
+	"strings"
 )
 
 const (
@@ -12,25 +13,24 @@ const (
 )
 
 type Farming struct {
-	Directory game.Binary  `toml:"directory"`
-	Steam     steam.Steam  `toml:"steam"`
-	Version   game.Version `toml:"version"`
-	Window    bool         `toml:"window"`
+	Directory game.Binary `toml:"directory"`
+	Steam     steam.Steam `toml:"steam"`
+	Window    bool        `toml:"window"`
 }
 
 func (f Farming) Start() (game.Game, error) {
-	g, err := game.New(f.Directory.String(), f.Version, f.Steam, f.Window)
+	g, err := game.New(f.Directory.String(), f.Steam, f.Window)
 	if err != nil {
 		return game.Game{}, err
 	}
 
-	log.Printf("-------- Server Manager (FS22-FS19) ---------")
-	log.Printf("Version : %s", g.Version.String())
+	log.Printf(strings.Repeat("―", 50))
+	log.Printf("Version : %s", g.Info.String)
 	log.Printf("Steam : %t", g.Steam)
 	log.Printf("Show Window : %t", g.ShowWindow)
 	log.Printf("Binary : %s", g.Binary)
 	log.Printf("Directory : %s", g.Directory)
-	log.Printf("---------------------------------------------")
+	log.Printf(strings.Repeat("―", 50))
 
 	g.HandleStart = func(game game.Game) error {
 		game.Process.ShowWindow(game.ShowWindow) //Set the process parameter before start
@@ -41,7 +41,7 @@ func (f Farming) Start() (game.Game, error) {
 		if !game.Process.Killed {
 
 			log.Println("Game closed, restarting in few seconds...")
-			err := game.Restart()
+			_, err := game.Restart()
 			if err != nil {
 				return err
 			}
@@ -54,7 +54,12 @@ func (f Farming) Start() (game.Game, error) {
 		return game.Game{}, err
 	}
 
-	err = g.Start() //Run game instance
+	g, err = g.Start() //Run game instance
+	if err != nil {
+		return game.Game{}, err
+	}
+
+	err = g.Process.Wait()
 	if err != nil {
 		return game.Game{}, err
 	}

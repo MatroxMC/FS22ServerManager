@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"syscall"
 	"unsafe"
 )
@@ -27,6 +28,8 @@ func Title(t string) (int, error) {
 		return 0, err
 	}
 	defer syscall.FreeLibrary(handle)
+
+	strconv.Itoa(len(t))
 
 	proc, err := syscall.GetProcAddress(handle, "SetConsoleTitleW")
 	if err != nil {
