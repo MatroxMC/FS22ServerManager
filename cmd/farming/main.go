@@ -25,7 +25,7 @@ type Farming struct {
 }
 
 func (f *Farming) Init() error {
-	g, err := game.New(f.Directory, f.Steam, f.Window)
+	g, err := game.Npoew(f.Directory, f.Steam, f.Window)
 	if err != nil {
 		return err
 	}

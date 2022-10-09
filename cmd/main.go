@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
 	"github.com/MatroxMC/FS22ServerManager/cmd/http"
+	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
 	"github.com/kataras/golog"
 	"os"
 	"os/signal"
@@ -34,7 +35,7 @@ var waitGroup = &sync.WaitGroup{}
 
 func main() {
 	handleSignal()
-
+	_, _ = terminal.Title("Farming Simulator Server Manager")
 	err := initConfig()
 	if err != nil {
 		panic(err)

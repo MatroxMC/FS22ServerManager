@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 type Status int
@@ -36,6 +37,8 @@ func (s Steam) WaitForRunning() Status {
 				return StatusOK
 			}
 		}
+
+		time.Sleep(1 * time.Second)
 	}
 }
 
