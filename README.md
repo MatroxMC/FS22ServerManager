@@ -6,6 +6,8 @@ This is a tools to manage your FS22 server.
 
 **TODO** : Add more information
 
+ADD CLIENT TO DOWNLOAD THE MODS (FIND HASH AND DOWNLOAD MODS)
+
 ## 🚀 In the future :
 - [ ] Auto start server (API implementation)
 - [X] Restart on server crash

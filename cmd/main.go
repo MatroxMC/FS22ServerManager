@@ -1,86 +1,67 @@
 package main
 
 import (
-	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
-	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
-	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
+	"github.com/MatroxMC/FS22ServerManager/cmd/http"
 	"log"
 	"os"
+	"os/signal"
 	"sync"
 )
 
-var Config = Property{
-	Game: farming.Farming{
-		Steam:     true,
-		Directory: farming.GameDir,
-		Window:    true,
+const (
+	ConfName = "config.toml"
+)
+
+var service = &Config{
+	Farming: farming.Farming{
+		Directory:   "D:\\Jeux\\Farming Simulator 22",
+		Steam:       true,
+		Window:      true,
+		RestartTime: 5,
 	},
-	Debug: 0,
+	Http: http.Http{
+		Address: "127.0.0.1",
+		Port:    8080,
+	},
 }
 
-type Property struct {
-	Game  farming.Farming `toml:"game"`
-	Debug int             `toml:"debug"`
-}
-
-var waitGroup = sync.WaitGroup{}
+var waitGroup = &sync.WaitGroup{}
 
 func main() {
-	err := SetLogFile("debug.log")
+	handleSignal()
+
+	err := initConfig()
 	if err != nil {
-		log.Println("Error while setting log file : ", err)
+		panic(err)
 	}
 
-	//Init and load configuration file
-	property, err := Config.init()
+	err = service.Farming.Start(waitGroup)
 	if err != nil {
-		log.Fatal("Error while loading config file : ", err)
+		panic(err)
 	}
+	log.Print("Farming Simulator Manager started")
 
-	waitGroup.Add(1)
-	go func() {
-		//Run the web server
-		game, err := property.Game.Start()
-		if err != nil {
-			log.Fatal("Error while starting the game : ", err)
-		}
-
-		//set console name
-		_, _ = terminal.Title(game.Info.String + " Server Manager")
-
-		game.Process.Wait()
-
-		waitGroup.Done()
-	}()
+	err = service.Http.Start(waitGroup)
+	if err != nil {
+		panic(err)
+	}
+	log.Print("Mod API started")
 
 	waitGroup.Wait()
 }
 
-// Init function make or load the config file
-func (p Property) init() (*Property, error) {
-	err := file.Exist(farming.ConfName)
-	if err != nil {
-		f, err := os.Create(farming.ConfName)
-		defer f.Close()
-		if err != nil {
-			return nil, err
-		}
+func handleSignal() {
+	c := make(chan os.Signal, 1)
 
-		//write default config
-		err = toml.NewEncoder(f).Encode(p)
-		if err != nil {
-			return nil, err
-		}
+	signal.Notify(c)
 
-		return &p, nil
-	}
+	go func() {
+		_ = <-c
 
-	var config Property
-	_, err = toml.DecodeFile(farming.ConfName, &config)
-	if err != nil {
-		return nil, err
-	}
+		service.Farming.Stop()
 
-	return &config, nil
+		log.Print("Closing...")
+
+	}()
 }

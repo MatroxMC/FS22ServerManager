@@ -1,9 +1,0 @@
-[game]
-version = "FS22"
-steam = true
-directory = "D:\\Jeux\\Farming Simulator 22"
-
-[web]
-port = 8080
-host = "localhost"
-password = "password"

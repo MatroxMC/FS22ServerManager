@@ -1,7 +1,6 @@
 package steam
 
 import (
-	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"golang.org/x/sys/windows/registry"
 	"os"
 	"time"
@@ -45,7 +44,9 @@ func (s Steam) GetExe() (string, error) {
 
 func (s Steam) IsInstalled() bool {
 	p, err := s.GetExe()
-	err = file.Exist(p)
+	if _, err := os.Stat(p); os.IsNotExist(err) {
+		return false
+	}
 	if err != nil {
 		return false
 	}

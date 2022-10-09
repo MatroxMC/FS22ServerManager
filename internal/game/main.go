@@ -2,136 +2,157 @@ package game
 
 import (
 	"fmt"
-	"github.com/MatroxMC/FS22ServerManager/internal/process"
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
-	"github.com/MatroxMC/FS22ServerManager/internal/tools/file"
 	"log"
 	"os"
-	"os/signal"
-	"path"
+	"os/exec"
+	"syscall"
+	"time"
 )
 
-type Binary string
+const (
+	HandleClosed HandleType = 0x0
+	HandleStart  HandleType = 0x1
+	HandleStop   HandleType = 0x2
+)
+
+type HandleType int
+type HandleFunction func() error
 
 type Game struct {
-	Binary      Binary
 	Steam       steam.Steam
 	Info        Info
-	Process     *process.Process
+	Cmd         exec.Cmd
 	ShowWindow  bool
 	Directory   string
-	HandleClose func(Game, error) error
-	HandleStart func(Game) error
 	Signal      chan os.Signal
-	Killed      bool
+	HandledFunc map[HandleType]HandleFunction
+	Test        bool
 }
 
-var CurrentGame Game
-
-func (g Game) Start() (*Game, error) {
-	//Create a new process
-	p, err := process.New(g.Binary.String())
-	if err != nil {
-		return &Game{}, err
-	}
-
-	g.Process = p   //set the process to the game
-	CurrentGame = g //Set the current game to the game
-
-	//If steam use steam
-	if g.Steam {
-		if !g.Steam.IsInstalled() {
-			return &Game{}, fmt.Errorf("steam is not installed")
-		}
-	}
-
-	if g.HandleStart != nil {
-		err = g.HandleStart(g)
-		if err != nil {
-			return &Game{}, err
-		}
-	}
-
-	// If steam not running the wait function is started and wait steam to run
-	if !g.Steam.IsRunning() {
-		log.Print("Steam is not running, waiting for steam to run")
-		err := g.Steam.Wait()
-		if err != nil {
-			return &Game{}, err
-		}
-	}
-
-	//Run the process with process package
-	err = p.Run()
-	if err != nil {
-		return &Game{}, err
-	}
-
-	return &g, nil
-}
-
-func (g Game) Init() (*Game, error) {
-	g.Signal = make(chan os.Signal, 1) //Create a new channel for signal
-
-	g.handleSignal(func() {
-		//I use Current game because this is in go routine (TODO: Clean this in the future)
-		if CurrentGame.Process != nil {
-			_ = CurrentGame.Process.Stop()
-		}
-	})
-
-	return &g, nil
-}
-
-func (g Game) Restart() (*Game, error) {
-	//Check if the process running and kill it
-	if g.Process.Running() {
-		_ = g.Process.Stop()
-	}
-
-	//Run the process again
-	return g.Start()
-}
-
-// This method handle the signal from main process and kill the game process
-func (g Game) handleSignal(f ...func()) {
-	signal.Notify(g.Signal)
-
-	go func() {
-		_ = <-g.Signal
-		if len(f) > 0 {
-			//Handle all function
-			for _, fn := range f {
-				fn()
-			}
-		}
-
-		signal.Stop(g.Signal)
-		os.Exit(0) //Exit the process with code 0 (no error)
-	}()
+type Info struct {
+	Binary string
+	Names  []string
+	String string
 }
 
 func New(directory string, steam steam.Steam, window bool) (*Game, error) {
-	//check if game binary exist
-	binary := Binary(path.Join(directory))
-	err := binary.Exist()
-	if err != nil {
-		return nil, err
+
+	//Check if the directory exist
+	if _, err := os.Stat(directory); os.IsNotExist(err) {
+		return &Game{}, fmt.Errorf("directory %s does not exist", directory)
 	}
 
+	//Return a clean Game struct
 	return &Game{
 		Info:       DefaultInfo(),
-		Binary:     binary,
 		Steam:      steam,
 		Directory:  directory,
 		ShowWindow: window,
 	}, nil
 }
 
-func (d Binary) Exist() error {
-	return file.Exist(string(d))
+func (g *Game) Start() error {
+	if _, err := os.Stat(g.BinaryPath()); os.IsNotExist(err) {
+		return fmt.Errorf("binary %s does not exist", g.BinaryPath())
+	}
+
+	e := exec.Command(g.BinaryPath())
+	e.Dir = g.Directory
+	e.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow: !g.ShowWindow,
+	}
+
+	g.Cmd = *e
+
+	err := g.handleFunction(HandleStart)
+	if err != nil {
+		return err
+	}
+
+	err = g.Cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	err = g.Cmd.Wait()
+	if err != nil {
+		err := g.handleFunction(HandleClosed)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = g.handleFunction(HandleStop)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (d Binary) String() string {
-	return string(d)
+func (g *Game) Restart(s time.Duration) error {
+	log.Print("Restarting in ", s.Seconds(), " seconds")
+	if err := g.Stop(); err != nil {
+		return err
+	}
+
+	time.Sleep(s * time.Second)
+
+	return g.Start()
+}
+
+func (g *Game) Stop() error {
+	if g.Cmd.Process == nil {
+		return nil
+	}
+
+	//check if app is running
+	if err := g.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
+		return nil
+	}
+
+	err := g.Cmd.Process.Kill()
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Printf("Killed %s", g.Info.String)
+
+	return nil
+}
+
+func (g *Game) handleFunction(h HandleType) error {
+	for t, f := range g.HandledFunc {
+		if t == h {
+			return f()
+		}
+	}
+
+	return nil
+}
+
+func (g *Game) NewHandler(f HandleFunction, h HandleType) {
+
+	if g.HandledFunc == nil {
+		g.HandledFunc = make(map[HandleType]HandleFunction)
+	}
+
+	g.HandledFunc[h] = f
+}
+
+func (g *Game) BinaryPath() string {
+	return fmt.Sprintf("%s\\%s", g.Directory, g.Info.Binary)
+}
+
+func DefaultInfo() Info {
+	return Info{
+		Binary: "dedicatedServer.exe",
+		Names: []string{
+			"Farming Simulator 22",
+			"22",
+			"FS22",
+		},
+		String: "Farming Simulator 22",
+	}
 }
