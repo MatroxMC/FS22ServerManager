@@ -3,17 +3,16 @@ package game
 import (
 	"fmt"
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
-	"log"
 	"os"
 	"os/exec"
 	"syscall"
-	"time"
 )
 
 const (
 	HandleClosed HandleType = 0x0
-	HandleStart  HandleType = 0x1
-	HandleStop   HandleType = 0x2
+	HandleInit   HandleType = 0x1
+	HandleStart  HandleType = 0x2
+	HandleStop   HandleType = 0x3
 )
 
 type HandleType int
@@ -27,7 +26,7 @@ type Game struct {
 	Directory   string
 	Signal      chan os.Signal
 	HandledFunc map[HandleType]HandleFunction
-	Test        bool
+	Killed      bool
 }
 
 type Info struct {
@@ -65,12 +64,19 @@ func (g *Game) Start() error {
 
 	g.Cmd = *e
 
-	err := g.handleFunction(HandleStart)
+	//Handle the init function before starting the game
+	err := g.handleFunction(HandleInit)
 	if err != nil {
 		return err
 	}
 
 	err = g.Cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	//Handle the start
+	err = g.handleFunction(HandleStart)
 	if err != nil {
 		return err
 	}
@@ -91,34 +97,28 @@ func (g *Game) Start() error {
 	return nil
 }
 
-func (g *Game) Restart(s time.Duration) error {
-	log.Print("Restarting in ", s.Seconds(), " seconds")
+func (g *Game) Restart() error {
 	if err := g.Stop(); err != nil {
 		return err
 	}
 
-	time.Sleep(s * time.Second)
-
 	return g.Start()
 }
 
-func (g *Game) Stop() error {
-	if g.Cmd.Process == nil {
-		return nil
-	}
-
-	//check if app is running
-	if err := g.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
-		return nil
-	}
-
-	err := g.Cmd.Process.Kill()
+func (g *Game) Kill() error {
+	err := g.Stop()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
+	g.Killed = true
+	return nil
+}
 
-	log.Printf("Killed %s", g.Info.String)
-
+func (g *Game) Stop() error {
+	if g.Cmd.Process == nil || g.Killed {
+		return nil
+	}
+	_ = g.Cmd.Process.Kill()
 	return nil
 }
 
@@ -133,11 +133,9 @@ func (g *Game) handleFunction(h HandleType) error {
 }
 
 func (g *Game) NewHandler(f HandleFunction, h HandleType) {
-
 	if g.HandledFunc == nil {
 		g.HandledFunc = make(map[HandleType]HandleFunction)
 	}
-
 	g.HandledFunc[h] = f
 }
 

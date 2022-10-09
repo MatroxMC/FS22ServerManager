@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Farming farming.Farming `toml:"farming"`
-	Http    http.Http       `toml:"http"`
+	Farming *farming.Farming `toml:"farming"`
+	Http    *http.Http       `toml:"http"`
+	Log     Log              `toml:"log"`
 }
 
 // Init function make or load the config file

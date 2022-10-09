@@ -3,11 +3,9 @@ package farming
 import (
 	"github.com/MatroxMC/FS22ServerManager/internal/game"
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
-	"log"
+	"github.com/kataras/golog"
 	"os"
-	"strings"
 	"sync"
-	"time"
 )
 
 /*
@@ -26,46 +24,65 @@ type Farming struct {
 	game        game.Game
 }
 
-func (f Farming) Start(w *sync.WaitGroup) error {
+func (f *Farming) Init() error {
 	g, err := game.New(f.Directory, f.Steam, f.Window)
 	if err != nil {
 		return err
 	}
 
-	g.Signal = make(chan os.Signal, 1)
+	f.game = *g
+	f.game.Signal = make(chan os.Signal, 1)
+	return nil
+}
 
-	g.NewHandler(func() error {
-		go g.Restart(time.Duration(f.RestartTime)) //bad idea
+func (f *Farming) Start(w *sync.WaitGroup) error {
+	err := f.Init()
+	if err != nil {
+		return err
+	}
+
+	f.game.NewHandler(func() error {
+		golog.Info("Server Manager started")
+		return nil
+	}, game.HandleStart)
+
+	f.game.NewHandler(func() error {
+		if !f.game.Killed {
+			go f.game.Restart() //restart the game after 5 seconds
+		}
 		return nil
 	}, game.HandleClosed)
+
+	if f.Steam {
+		if !f.Steam.IsRunning() {
+			golog.Info("Steam is not running, waiting for steam to start")
+			s := f.Steam.WaitForRunning()
+			if s == steam.StatusExited {
+				return nil
+			}
+
+			golog.Info("Steam is running")
+		}
+	}
 
 	w.Add(1)
 	go func() {
 		defer w.Done()
 
-		err := g.Start()
+		err := f.game.Start()
 		if err != nil {
 			panic(err)
 		}
 	}()
-
-	f.game = *g
-
 	return nil
 }
 
-func (f Farming) Stop() {
-	err := f.game.Stop()
-	if err != nil {
-		log.Printf("Error while stopping the game: %s", err)
-	}
-}
+func (f *Farming) Stop() error {
+	f.game.Signal <- os.Interrupt
 
-func PrintInfo(g game.Game) {
-	log.Printf(strings.Repeat("―", 50))
-	log.Printf("Version : %s", g.Info.String)
-	log.Printf("Steam : %t", g.Steam)
-	log.Printf("Show Window : %t", g.ShowWindow)
-	log.Printf("Directory : %s", g.Directory)
-	log.Printf(strings.Repeat("―", 50))
+	err := f.game.Kill()
+	if err != nil {
+		return err
+	}
+	return nil
 }

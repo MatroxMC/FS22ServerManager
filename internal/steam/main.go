@@ -3,32 +3,40 @@ package steam
 import (
 	"golang.org/x/sys/windows/registry"
 	"os"
-	"time"
+	"os/signal"
+	"syscall"
 )
 
+type Status int
+
 const (
-	RegistryKey  = registry.CURRENT_USER
-	RegistryPath = `Software\Valve\Steam`
+	StatusOK     Status = 0x0
+	StatusExited Status = 0x1
+	RegistryKey         = registry.CURRENT_USER
+	RegistryPath        = `Software\Valve\Steam`
 )
 
 type Steam bool
 
-func (s Steam) Wait() error {
+func (s Steam) WaitForRunning() Status {
+	exit := make(chan os.Signal, 1)
 
-	var run = false //If the game is running
-	var msg = false //If the message has been sent
+	go func() {
+		signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
+	}()
 
-	for !run {
-		run = s.IsRunning()
-		if !run {
-			if !msg {
-				msg = true
+	for {
+		select {
+		case <-exit:
+			signal.Stop(exit)
+			close(exit)
+			return StatusExited
+		default:
+			if s.IsRunning() {
+				return StatusOK
 			}
-			time.Sleep(time.Second * 2)
 		}
 	}
-
-	return nil
 }
 
 func (s Steam) GetExe() (string, error) {
