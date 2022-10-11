@@ -20,6 +20,7 @@ type HandleFunction func() error
 
 type Game struct {
 	Steam       steam.Steam
+	Api         Api
 	Info        Info
 	Cmd         exec.Cmd
 	ShowWindow  bool
