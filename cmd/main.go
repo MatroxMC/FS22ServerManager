@@ -35,6 +35,7 @@ var waitGroup = &sync.WaitGroup{}
 
 func main() {
 	handleSignal()
+
 	_, _ = terminal.Title("Farming Simulator Server Manager")
 	err := initConfig()
 	if err != nil {
@@ -58,31 +59,15 @@ func main() {
 
 func handleSignal() {
 	c := make(chan os.Signal, 1)
-
 	signal.Notify(c)
 
 	go func() {
 		_ = <-c
 
-		golog.Info("Stop all services...")
+		golog.Debug("Closing http & farming server")
 
-		go func() {
-			err := service.Farming.Stop()
-			if err != nil {
-				golog.Print(err)
-			}
-
-			golog.Debug("Server Manager stopped")
-		}()
-
-		go func() {
-			err := service.Http.Stop()
-			if err != nil {
-				golog.Print(err)
-			}
-
-			golog.Debug("Mod API stopped")
-		}()
+		service.Farming.Stop()
+		service.Http.Stop()
 
 		time.AfterFunc(time.Second*5, func() {
 			golog.Warn("Force stop")

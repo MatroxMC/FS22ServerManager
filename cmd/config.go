@@ -4,12 +4,14 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
 	"github.com/MatroxMC/FS22ServerManager/cmd/http"
+	"github.com/MatroxMC/FS22ServerManager/internal/server"
 	"os"
 )
 
 type Config struct {
 	Farming *farming.Farming `toml:"farming"`
 	Http    *http.Http       `toml:"http"`
+	Api     *server.Api      `toml:"api"`
 	Log     Log              `toml:"log"`
 }
 
