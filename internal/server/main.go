@@ -1,14 +1,12 @@
 package server
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/MatroxMC/FS22ServerManager/internal/event"
 	"github.com/MatroxMC/FS22ServerManager/internal/server/config"
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
 	"github.com/kataras/golog"
 	"os"
-	"time"
 )
 
 type Server struct {
@@ -88,47 +86,7 @@ func (s *Server) Start() error {
 		}
 	}
 
-	file, err := os.ReadFile("C:\\Users\\matro\\Documents\\My Games\\FarmingSimulator2022\\dedicated_server\\logs\\server.log")
-	if err != nil {
-		return err
-	}
-
-	var last string
-	for {
-		_, token, _ := scanLastNonEmptyLine(file, false)
-
-		if string(token) != last {
-			fmt.Println(string(token))
-		}
-
-		last = string(token)
-
-		time.Sleep(1 * time.Second)
-	}
-
 	return nil
-}
-
-func scanLastNonEmptyLine(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	// Set advance to after our last line
-	if atEOF {
-		advance = len(data)
-	} else {
-		// data[advance:] now contains a possibly incomplete line
-		advance = bytes.LastIndexAny(data, "\n\r") + 1
-	}
-	data = data[:advance]
-
-	// Remove empty lines (strip EOL chars)
-	data = bytes.TrimRight(data, "\n\r")
-
-	// We have no non-empty lines, so advance but do not return a token.
-	if len(data) == 0 {
-		return advance, nil, nil
-	}
-
-	token = data[bytes.LastIndexAny(data, "\n\r")+1:]
-	return advance, token, nil
 }
 
 func (s *Server) Stop() error {
