@@ -63,7 +63,7 @@ func handleSignal() {
 
 	go func() {
 		_ = <-c
-		
+
 		golog.Debug("Closing http & farming server")
 
 		service.Farming.Stop()

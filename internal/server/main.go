@@ -28,6 +28,7 @@ type Info struct {
 }
 
 func NewServer(directory string, executable string, steam steam.Steam, window bool) (*Server, error) {
+
 	//Check if the directory exist
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		return &Server{}, fmt.Errorf("directory %s does not exist", directory)
@@ -43,16 +44,27 @@ func NewServer(directory string, executable string, steam steam.Steam, window bo
 		return &Server{}, err
 	}
 
-	//Return a clean Server struct
-	return &Server{
+	s := &Server{
 		DedicatedConfig: d,
 		Program:         p,
 		Info:            DefaultInfo(),
 		Signal:          make(chan os.Signal, 1),
-	}, nil
+	}
+
+	api, err := NewApi(s)
+	if err != nil {
+		return &Server{}, err
+	}
+
+	s.Api = *api
+
+	//Return a clean Server struct
+	return s, nil
 }
 
 func (s *Server) Init() error {
+
+	s.Api.StartDaemon()
 
 	return nil
 }
@@ -85,6 +97,12 @@ func (s *Server) Start() error {
 			golog.Info("Steam is running")
 		}
 	}
+
+	golog.Info("Starting server")
+
+	<-s.Api.Ready
+
+	golog.Info("Server is ready")
 
 	return nil
 }

@@ -5,11 +5,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"github.com/kataras/golog"
-	"io"
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"sync"
 )
 
@@ -93,11 +91,6 @@ func ParseMods(s string) {
 		}
 
 		n := s + "\\" + f.Name()
-		hash, err := md5sum(n)
-		if err != nil {
-			log.Print(err)
-			continue
-		}
 
 		st, err := os.Stat(n)
 		if err != nil {
@@ -105,11 +98,15 @@ func ParseMods(s string) {
 			continue
 		}
 
-		//get file hash
+		hash, err := md5sum(f.Name())
+		if err != nil {
+			log.Print(err)
+			continue
+		}
 
 		files = append(files, Mod{
 			Name: f.Name(),
-			Path: path.Join(s, f.Name()),
+			Path: "http://127.0.0.1/mods/" + f.Name(),
 			Size: st.Size(),
 			Hash: hash,
 		})
@@ -129,16 +126,8 @@ func handleHttp(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func md5sum(filePath string) (string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
+func md5sum(p string) (string, error) {
 	hash := md5.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
+	hash.Write([]byte(p))
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }

@@ -10,10 +10,11 @@ import (
 )
 
 const (
-	HandleProgramInit    event.HandleType = 0x0
-	HandleProgramRun     event.HandleType = 0x1
-	HandleProgramStopped event.HandleType = 0x2
-	HandleProgramClosed  event.HandleType = 0x3
+	ProgramInit    event.HandleType = 0x0
+	ProgramRun     event.HandleType = 0x1
+	ProgramStarted event.HandleType = 0x2
+	ProgramStopped event.HandleType = 0x3
+	ProgramClosed  event.HandleType = 0x4
 )
 
 type Program struct {
@@ -35,7 +36,7 @@ func (p *Program) Init() error {
 
 	p.Cmd = *e
 
-	err := p.Handler.HandleFunc(HandleProgramInit)
+	err := p.Handler.HandleFunc(ProgramInit)
 	if err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func (p *Program) Start() error {
 		return err
 	}
 
-	err = p.Handler.HandleFunc(HandleProgramRun)
+	err = p.Handler.HandleFunc(ProgramRun)
 	if err != nil {
 		return err
 	}
@@ -64,13 +65,13 @@ func (p *Program) Start() error {
 		//Wait for the program to exit
 		err = p.Cmd.Wait()
 		if err != nil {
-			err = p.Handler.HandleFunc(HandleProgramStopped)
+			err = p.Handler.HandleFunc(ProgramStopped)
 			if err != nil {
 				return
 			}
 		}
 
-		err = p.Handler.HandleFunc(HandleProgramClosed)
+		err = p.Handler.HandleFunc(ProgramClosed)
 		if err != nil {
 			return
 		}

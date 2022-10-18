@@ -34,7 +34,7 @@ func (f *Farming) Init() error {
 	f.ProgramHandler().NewHandler(func() error {
 		golog.Debug("TODO: Restart the server")
 		return nil
-	}, server.HandleProgramStopped)
+	}, server.ProgramStopped)
 
 	//Init default variables
 	f.server = *g
