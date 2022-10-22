@@ -45,18 +45,18 @@ func (a *Api) Start() error {
 	c := &http.Client{}
 	req, err := http.NewRequest("POST", u, strings.NewReader(url.Values{
 		"game_name":           {"Managed By FS22ServerManager"},
-		"admin_password":      {"E7DYYKFP"},
-		"game_password":       {"LS7XJFKJ"},
-		"savegame":            {"1"},
+		"admin_password":      {a.server.DedicatedConfig.Webserver.InitialAdmin.Passphrase},
+		"game_password":       {a.server.GameConfig.CreateGame.Password},
+		"savegame":            {a.server.GameConfig.CreateGame.Name},
 		"map_start":           {"default_MapUS"},
 		"difficulty":          {"2"},
-		"server_port":         {"10823"},
-		"max_player":          {"12"},
-		"mp_language":         {"en"},
+		"server_port":         {a.server.GameConfig.CreateGame.Port},
+		"max_player":          {a.server.GameConfig.CreateGame.Capacity},
+		"mp_language":         {a.server.GameConfig.MpLanguage},
 		"auto_save_interval":  {"180"},
 		"stats_interval":      {"360"},
 		"pause_game_if_empty": {"2"},
-		"crossplay_allowed":   {"on"},
+		"crossplay_allowed":   {a.server.GameConfig.CreateGame.AllowCrossPlay},
 		"start_server":        {"Start"},
 	}.Encode()))
 	if err != nil {

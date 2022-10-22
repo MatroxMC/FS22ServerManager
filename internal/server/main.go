@@ -13,6 +13,7 @@ import (
 type Server struct {
 	Program         Program
 	DedicatedConfig config.DedicatedConfig
+	GameConfig      config.GameConfig
 	Api             Api
 	Info            Info
 	Handler         event.Handler
@@ -25,6 +26,7 @@ type Info struct {
 	String          string
 	DataPath        string
 	DedicatedConfig string
+	GameConfig      string
 }
 
 func NewServer(directory string, executable string, steam steam.Steam, window bool) (*Server, error) {
@@ -44,8 +46,14 @@ func NewServer(directory string, executable string, steam steam.Steam, window bo
 		return &Server{}, err
 	}
 
+	e, err := config.GetGameConfig(DefaultInfo().DataPath, DefaultInfo().GameConfig)
+	if err != nil {
+		return &Server{}, err
+	}
+
 	s := &Server{
 		DedicatedConfig: d,
+		GameConfig:      e,
 		Program:         p,
 		Info:            DefaultInfo(),
 		Signal:          make(chan os.Signal, 1),
@@ -159,6 +167,7 @@ func DefaultInfo() Info {
 	return Info{
 		DedicatedBinary: "dedicatedServer.exe",
 		DedicatedConfig: "dedicatedServer.xml",
+		GameConfig:      "gameSettings.xml",
 		Names: []string{
 			"Farming Simulator 22",
 			"22",

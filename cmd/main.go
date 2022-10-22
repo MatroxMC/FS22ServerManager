@@ -47,6 +47,7 @@ var service = &Config{
 var waitGroup = &sync.WaitGroup{}
 
 func main() {
+
 	handleSignal()
 
 	_, _ = terminal.Title("Farming Simulator Server Manager")
