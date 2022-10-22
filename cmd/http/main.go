@@ -29,9 +29,9 @@ var mods []Mod
 func (h *Http) Start(w *sync.WaitGroup) error {
 	w.Add(1)
 	go func() {
-
-		golog.Debug("Getting mods...")
 		f := "C:\\Users\\matro\\Documents\\My Games\\FarmingSimulator2022\\mods"
+
+		golog.Debug("getting mods in %s", f)
 
 		ParseMods(f)
 
@@ -58,7 +58,7 @@ func (h *Http) Start(w *sync.WaitGroup) error {
 		w.Done()
 	}()
 
-	golog.Debug("Mods Manager started")
+	golog.Debug("mods Manager started")
 
 	return nil
 }
@@ -66,7 +66,7 @@ func (h *Http) Start(w *sync.WaitGroup) error {
 func (h *Http) Stop() error {
 
 	if h.serve != nil {
-		golog.Debug("Server found, stopping...")
+		golog.Debug("stop http server")
 		err := h.serve.Close()
 		if err != nil {
 			return err
@@ -77,7 +77,7 @@ func (h *Http) Stop() error {
 }
 
 func ParseMods(s string) {
-	golog.Debug("Parsing mods...")
+	golog.Debug("parsing mod(s)")
 	dir, err := os.ReadDir(s)
 	if err != nil {
 		log.Print(err)

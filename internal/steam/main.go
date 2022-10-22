@@ -19,8 +19,14 @@ const (
 
 type Steam bool
 
+// WaitForRunning Wait until steam is open to do the next actions
+// It does not block for the closing of the program
 func (s Steam) WaitForRunning() Status {
 	exit := make(chan os.Signal, 1)
+	defer func() {
+		signal.Stop(exit)
+		close(exit)
+	}()
 
 	go func() {
 		signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
@@ -29,8 +35,6 @@ func (s Steam) WaitForRunning() Status {
 	for {
 		select {
 		case <-exit:
-			signal.Stop(exit)
-			close(exit)
 			return StatusExited
 		default:
 			if s.IsRunning() {
@@ -42,6 +46,7 @@ func (s Steam) WaitForRunning() Status {
 	}
 }
 
+// GetExe Return the steam installation folder
 func (s Steam) GetExe() (string, error) {
 	k, err := registry.OpenKey(RegistryKey, RegistryPath, registry.QUERY_VALUE)
 	if err != nil {
@@ -53,6 +58,7 @@ func (s Steam) GetExe() (string, error) {
 	return p, err
 }
 
+// IsInstalled Look for the steam installation folder and see if it is installed
 func (s Steam) IsInstalled() bool {
 	p, err := s.GetExe()
 	if _, err := os.Stat(p); os.IsNotExist(err) {
@@ -64,6 +70,7 @@ func (s Steam) IsInstalled() bool {
 	return true
 }
 
+// GetAutoLoginUser Return user to register for automatic registration
 func (s Steam) GetAutoLoginUser() (string, error) {
 	k, err := registry.OpenKey(RegistryKey, RegistryPath, registry.QUERY_VALUE)
 	if err != nil {
@@ -79,6 +86,7 @@ func (s Steam) GetAutoLoginUser() (string, error) {
 	return u, nil
 }
 
+// IsRunning check if steam is started by taking the pid and the process and return a true or false value
 func (s Steam) IsRunning() bool {
 	//https://github.com/jshackles/idle_master/issues/217
 	pid, err := s.GetPID()
@@ -100,6 +108,7 @@ func (s Steam) IsRunning() bool {
 	return true
 }
 
+// GetPID Retrieve the PID from the Windows Registry and return it
 func (s Steam) GetPID() (int, error) {
 
 	k, err := registry.OpenKey(RegistryKey, RegistryPath+`\ActiveProcess`, registry.QUERY_VALUE)

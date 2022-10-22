@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/BurntSushi/toml"
 	"github.com/MatroxMC/FS22ServerManager/cmd/farming"
 	"github.com/MatroxMC/FS22ServerManager/cmd/http"
+	"github.com/MatroxMC/FS22ServerManager/internal/server"
 	"github.com/MatroxMC/FS22ServerManager/internal/terminal"
 	"github.com/kataras/golog"
 	"os"
@@ -14,6 +16,17 @@ import (
 const (
 	ConfName = "config.toml"
 )
+
+type Log struct {
+	Level string `toml:"level"`
+}
+
+type Config struct {
+	Farming *farming.Farming `toml:"farming"`
+	Http    *http.Http       `toml:"http"`
+	Api     *server.Api      `toml:"api"`
+	Log     Log              `toml:"log"`
+}
 
 var service = &Config{
 	Farming: &farming.Farming{
@@ -57,6 +70,34 @@ func main() {
 	waitGroup.Wait()
 }
 
+// Init function make or load the config file
+func initConfig() error {
+
+	//If the config file does not exist, create it
+	if _, err := os.Stat(ConfName); os.IsNotExist(err) {
+		f, err := os.Create(ConfName)
+		defer f.Close()
+		if err != nil {
+			return err
+		}
+
+		//write default config
+		err = toml.NewEncoder(f).Encode(service)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	_, err := toml.DecodeFile(ConfName, service)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func handleSignal() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c)
@@ -64,13 +105,13 @@ func handleSignal() {
 	go func() {
 		_ = <-c
 
-		golog.Debug("Closing http & farming server")
+		golog.Debug("signal received")
 
 		service.Farming.Stop()
 		service.Http.Stop()
 
 		time.AfterFunc(time.Second*5, func() {
-			golog.Warn("Force stop")
+			golog.Warn("FORCE CLOSE")
 			os.Exit(0)
 		})
 	}()

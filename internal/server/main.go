@@ -7,6 +7,7 @@ import (
 	"github.com/MatroxMC/FS22ServerManager/internal/steam"
 	"github.com/kataras/golog"
 	"os"
+	"time"
 )
 
 type Server struct {
@@ -16,7 +17,6 @@ type Server struct {
 	Info            Info
 	Handler         event.Handler
 	Signal          chan os.Signal
-	Killed          bool
 }
 
 type Info struct {
@@ -62,20 +62,8 @@ func NewServer(directory string, executable string, steam steam.Steam, window bo
 	return s, nil
 }
 
-func (s *Server) Init() error {
-
-	s.Api.StartDaemon()
-
-	return nil
-}
-
 func (s *Server) Run() error {
-	err := s.Init()
-	if err != nil {
-		return err
-	}
-
-	err = s.Program.Start()
+	err := s.Program.Start()
 	if err != nil {
 		return err
 	}
@@ -84,35 +72,87 @@ func (s *Server) Run() error {
 }
 
 func (s *Server) Start() error {
-	ss := s.Program.Steam
+	st := s.Program.Steam
 
-	if ss {
-		if !ss.IsRunning() {
-			golog.Info("Steam is not running, waiting for steam to start")
-			s := ss.WaitForRunning()
+	if st {
+		if !st.IsRunning() {
+			golog.Info("steam is not running, waiting for steam to start")
+			r := st.WaitForRunning()
 
-			if s == steam.StatusExited {
+			if r == steam.StatusExited {
 				return nil
 			}
-			golog.Info("Steam is running")
+
+			golog.Info("steam is running")
 		}
 	}
 
-	golog.Info("Starting server")
+	for status := s.IsStarted(); !status; {
+		select {
+		case <-s.Signal:
+			return nil
+		default:
+			time.Sleep(1 * time.Second)
+			status = s.IsStarted()
+		}
+	}
 
-	<-s.Api.Ready
+	golog.Debug("api is running")
 
-	golog.Info("Server is ready")
+	err := s.Api.Login()
+	if err != nil {
+		return err
+	}
+
+	golog.Debug("logged in to api cookie: ", s.Api.cookie)
+
+	go func() {
+		for true {
+			select {
+			case <-s.Signal:
+				return
+			default:
+				stats := s.Api.IsOnline()
+
+				if !stats {
+
+				}
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+
+		golog.Info("stop go routine status checker")
+	}()
+
+	err = s.Api.Start()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
+func (s *Server) IsStarted() bool {
+	_, err := s.Api.HTTPStatus()
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 func (s *Server) Stop() error {
+	s.Signal <- os.Interrupt
 	return s.Program.Stop()
 }
 
 func (s *Server) Wait() error {
 	return s.Program.Cmd.Wait()
+}
+
+func (s *Server) Restart() {
+	golog.Info("restarting server")
 }
 
 func DefaultInfo() Info {

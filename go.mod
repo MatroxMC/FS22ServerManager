@@ -8,4 +8,9 @@ require (
 	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec
 )
 
-require github.com/kataras/pio v0.0.10 // indirect
+require (
+	github.com/PuerkitoBio/goquery v1.8.0 // indirect
+	github.com/andybalholm/cascadia v1.3.1 // indirect
+	github.com/kataras/pio v0.0.10 // indirect
+	golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
+)

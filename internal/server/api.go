@@ -1,66 +1,30 @@
 package server
 
 import (
-	"github.com/MatroxMC/FS22ServerManager/internal/event"
-	"github.com/kataras/golog"
+	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"net/url"
-	"time"
+	"strings"
 )
 
 type Api struct {
-	server   *Server
-	Password string
-	Username string
-	Ready    chan bool
-	Logged   bool
-	cookie   string
-	handler  event.Handler
+	server *Server
+	Logged bool
+	cookie string
 }
 
 const (
 	Url      = "http://192.168.1.42:8080"
-	LoginURL = "/index.html"
+	IndexURL = "/index.html"
 )
 
 func NewApi(s *Server) (*Api, error) {
 	d := &Api{
-		server:   s,
-		Password: "secret",
-		Username: "test",
-		Ready:    make(chan bool),
+		server: s,
 	}
 
 	return d, nil
-}
-
-func (a *Api) StartDaemon() {
-	go func() {
-
-		golog.Info("Starting API daemon")
-
-		for {
-			select {
-			case <-a.server.Signal:
-				golog.Debug("api task received signal")
-				return
-
-			default:
-
-				s, err := a.HTTPStatus()
-				if err != nil {
-					continue
-				}
-
-				if s == 200 {
-					a.Ready <- true
-				}
-
-				time.Sleep(1 * time.Second)
-			}
-		}
-
-	}()
 }
 
 func (a *Api) HTTPStatus() (int, error) {
@@ -72,9 +36,51 @@ func (a *Api) HTTPStatus() (int, error) {
 	return resp.StatusCode, nil
 }
 
+func (a *Api) Start() error {
+	u, err := url.JoinPath(Url, IndexURL)
+	if err != nil {
+		return err
+	}
+
+	c := &http.Client{}
+	req, err := http.NewRequest("POST", u, strings.NewReader(url.Values{
+		"game_name":           {"Managed By FS22ServerManager"},
+		"admin_password":      {"E7DYYKFP"},
+		"game_password":       {"LS7XJFKJ"},
+		"savegame":            {"1"},
+		"map_start":           {"default_MapUS"},
+		"difficulty":          {"2"},
+		"server_port":         {"10823"},
+		"max_player":          {"12"},
+		"mp_language":         {"en"},
+		"auto_save_interval":  {"180"},
+		"stats_interval":      {"360"},
+		"pause_game_if_empty": {"2"},
+		"crossplay_allowed":   {"on"},
+		"start_server":        {"Start"},
+	}.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Cookie", "SessionID="+a.cookie)
+
+	//send request
+	resp, err := c.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
+	}
+
+	return nil
+}
+
 func (a *Api) Login() error {
 
-	u, err := url.JoinPath(Url, LoginURL)
+	u, err := url.JoinPath(Url, IndexURL)
 	if err != nil {
 		return err
 	}
@@ -93,11 +99,33 @@ func (a *Api) Login() error {
 		if cookie.Name == "SessionID" {
 			a.cookie = cookie.Value
 			a.Logged = true
-
-			golog.Debug("Logged in API")
 			break
 		}
 	}
 
 	return nil
+}
+
+func (a *Api) IsOnline() bool {
+	h, err := http.Get(Url)
+	if err != nil {
+		return false
+	}
+	if h.StatusCode != 200 {
+		return false
+	}
+
+	doc, err := goquery.NewDocumentFromReader(h.Body)
+	if err != nil {
+		return false
+	}
+
+	o := false
+	doc.Find(".status-indicator").Each(func(i int, s *goquery.Selection) {
+		if s.Text() == "ONLINE" {
+			o = true
+		}
+	})
+
+	return o
 }

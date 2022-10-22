@@ -24,7 +24,7 @@ type Program struct {
 	Cmd        exec.Cmd
 	Steam      steam.Steam
 	Handler    event.Handler
-	onShutdown bool
+	Shutdown   bool
 }
 
 func (p *Program) Init() error {
@@ -45,6 +45,9 @@ func (p *Program) Init() error {
 }
 
 func (p *Program) Start() error {
+	if p.Shutdown {
+		return nil
+	}
 	err := p.Init()
 	if err != nil {
 		return err
@@ -81,11 +84,11 @@ func (p *Program) Start() error {
 }
 
 func (p *Program) Stop() error {
-	if p.onShutdown {
+	if p.Shutdown {
 		return nil
 	}
 
-	p.onShutdown = true
+	p.Shutdown = true
 
 	if p.Cmd.Process == nil {
 		return nil
